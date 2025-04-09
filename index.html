@@ -73,12 +73,7 @@
 
   <div class="container">
     <h2 id="main-title">Select Your Class</h2>
-    <div class="grid" id="class-grid">
-      <!-- ARIA-enhanced buttons -->
-      ${[...'pre-primary', ...Array.from({length: 12}, (_, i) => i + 1)].map(cls => `
-        <div class="card" role="button" tabindex="0" aria-label="Select Class ${cls}" data-class="${cls}">${cls === 'pre-primary' ? 'Pre-Primary' : `Class ${cls}`}</div>
-      `).join('')}
-    </div>
+    <div class="grid" id="class-grid"></div>
 
     <div class="grid hidden" id="subject-grid"></div>
     <div class="back-button hidden" id="back-button">← Back to Classes</div>
@@ -97,14 +92,22 @@
       8: ['Bengali (Sahityamela + Pather Panchali)', 'English', 'Math', 'Science', 'History', 'Geography'],
       9: ['Bengali', 'English', 'Mathematics', 'Physical Science', 'Life Science', 'History', 'Geography'],
       10: ['Bengali', 'English', 'Mathematics', 'Physical Science', 'Life Science', 'History', 'Geography'],
-      11: ['Languages: Bengali, English', 'Set 1', 'Set 2', 'Set 3'],
-      12: ['Languages: Bengali, English', 'Set 1', 'Set 2', 'Set 3']
+      11: ['Languages', 'Set 1', 'Set 2', 'Set 3'],
+      12: ['Languages', 'Set 1', 'Set 2', 'Set 3']
     };
 
     const classGrid = document.getElementById('class-grid');
     const subjectGrid = document.getElementById('subject-grid');
     const backButton = document.getElementById('back-button');
     const title = document.getElementById('main-title');
+
+    const classes = ['pre-primary', ...Array.from({ length: 12 }, (_, i) => i + 1)];
+
+    classGrid.innerHTML = classes.map(cls => `
+      <div class="card" role="button" tabindex="0" aria-label="Select ${cls === 'pre-primary' ? 'Pre-Primary' : `Class ${cls}`}" data-class="${cls}">
+        ${cls === 'pre-primary' ? 'Pre-Primary' : `Class ${cls}`}
+      </div>
+    `).join('');
 
     classGrid.addEventListener('click', e => {
       const card = e.target.closest('.card');

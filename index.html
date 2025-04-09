@@ -9,6 +9,7 @@
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#1e293b" />
   <title>Subha4u | WB Board Study Help</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -86,8 +87,9 @@
   <div class="container">
     <h2 id="main-title">Select Your Class</h2>
     <div class="grid" id="class-grid"></div>
+    <div class="grid hidden" id="set-grid"></div>
     <div class="grid hidden" id="subject-grid"></div>
-    <div class="back-button hidden" id="back-button">← Back to Classes</div>
+    <div class="back-button hidden" id="back-button">← Back</div>
   </div>
 
   <script>
@@ -103,64 +105,100 @@
       8: ['Bengali (Sahityamela + Pather Panchali)', 'English', 'Math', 'Science', 'History', 'Geography'],
       9: ['Bengali', 'English', 'Mathematics', 'Physical Science', 'Life Science', 'History', 'Geography'],
       10: ['Bengali', 'English', 'Mathematics', 'Physical Science', 'Life Science', 'History', 'Geography'],
-      11: ['Languages', 'Set 1', 'Set 2', 'Set 3'],
-      12: ['Languages', 'Set 1', 'Set 2', 'Set 3']
+      11: {
+        'Languages': ['Bengali', 'English'],
+        'Set 1': ['Physics (PHYS)', 'Nutrition (NUTN)', 'Chemistry (CHEM)', 'Economics (ECON)', 'Mathematics (MATH)', 'Phychology (PSYC)', 'Anthropology (ANTH)', 'Agriculture(AGRI)', 'Biological Science (BIOS)', 'Statistics (STAT)', 'Geography (GEGR)', 'Computer Science (COMS)', 'Modern Computer Application (COMA)', 'Data Science (DTSC)', 'Artificial Intelligence (ARTI)', 'Environment Studies (ENVS)', 'Science of Well Being(SOWB)', 'Cyber Security(CBST)'],
+        'Set 2': ['Accountancy (ACCT)', 'Business Studies (BSTD)', 'Commercial Law and Preliminaries of Auditing (CLPA)', 'Costing and Taxation (CSTX)', 'Economics (ECON)', 'Science of Well Being(SOWB)', 'Applied Artificial Intelligence(APAI)', 'Modern Computer Application (COMA)', 'Environment Studies (ENVS)', 'Health And Physical Education (HPED)', 'Visual Arts(VISA)', 'Music (MUSC)', 'Mathematics (MATH)'],
+        'Set 3': ['Political Science (POLS)', 'Education (EDCN)', 'Nutrition (NUTN)', 'Journalism & Mass Communication (JMCN)', 'Sanskrit (SNSK)', 'Persian (PRSN)', 'Arabic (ARBC)', 'Philosophy (PHIL)', 'Sociology (SOCG)', 'Economics (ECON)', 'History (HIST)', 'Anthropology (ANTH)', 'Phychology (PSYC)', 'Mathematics (MATH)', 'Agriculture (AGRI)', 'Geography (GEGR)', 'Human Development and Resource Management (HDRM)', 'Music (MUSC)', 'Visual Arts (VISA)', 'Health and Physical Education (HPED)', 'Modern Computer Application (COMA)', 'Environment Studies (ENVS)', 'Applied Artificial Intelligence(APAI)', 'Science of Well Being(SOWB)']
+      },
+      12: {
+        'Languages': ['Bengali', 'English'],
+        'Set 1': ['Physics (PHYS)', 'Nutrition (NUTN)', 'Chemistry (CHEM)', 'Economics (ECON)', 'Mathematics (MATH)', 'Phychology (PSYC)', 'Anthropology (ANTH)', 'Agriculture(AGRI)', 'Biological Science (BIOS)', 'Statistics (STAT)', 'Geography (GEGR)', 'Computer Science (COMS)', 'Modern Computer Application (COMA)', 'Data Science (DTSC)', 'Artificial Intelligence (ARTI)', 'Environment Studies (ENVS)', 'Science of Well Being(SOWB)', 'Cyber Security(CBST)'],
+        'Set 2': ['Accountancy (ACCT)', 'Business Studies (BSTD)', 'Commercial Law and Preliminaries of Auditing (CLPA)', 'Costing and Taxation (CSTX)', 'Economics (ECON)', 'Science of Well Being(SOWB)', 'Applied Artificial Intelligence(APAI)', 'Modern Computer Application (COMA)', 'Environment Studies (ENVS)', 'Health And Physical Education (HPED)', 'Visual Arts(VISA)', 'Music (MUSC)', 'Mathematics (MATH)'],
+        'Set 3': ['Political Science (POLS)', 'Education (EDCN)', 'Nutrition (NUTN)', 'Journalism & Mass Communication (JMCN)', 'Sanskrit (SNSK)', 'Persian (PRSN)', 'Arabic (ARBC)', 'Philosophy (PHIL)', 'Sociology (SOCG)', 'Economics (ECON)', 'History (HIST)', 'Anthropology (ANTH)', 'Phychology (PSYC)', 'Mathematics (MATH)', 'Agriculture (AGRI)', 'Geography (GEGR)', 'Human Development and Resource Management (HDRM)', 'Music (MUSC)', 'Visual Arts (VISA)', 'Health and Physical Education (HPED)', 'Modern Computer Application (COMA)', 'Environment Studies (ENVS)', 'Applied Artificial Intelligence(APAI)', 'Science of Well Being(SOWB)']
+      }
     };
 
     const classGrid = document.getElementById('class-grid');
+    const setGrid = document.getElementById('set-grid');
     const subjectGrid = document.getElementById('subject-grid');
-    const backButton = document.getElementById('back-button');
-    const title = document.getElementById('main-title');
+    const mainTitle = document.getElementById('main-title');
+    const backBtn = document.getElementById('back-button');
 
-    const classes = ['pre-primary', ...Array.from({ length: 12 }, (_, i) => i + 1)];
-
-    classGrid.innerHTML = classes.map(cls => `
-      <div class="card" role="button" tabindex="0" aria-label="Select ${cls === 'pre-primary' ? 'Pre-Primary' : `Class ${cls}`}" data-class="${cls}">
-        ${cls === 'pre-primary' ? 'Pre-Primary' : `Class ${cls}`}
-      </div>
-    `).join('');
-
-    classGrid.addEventListener('click', e => {
-      const card = e.target.closest('.card');
-      if (!card) return;
-      const cls = card.dataset.class;
-      showSubjects(cls);
-    });
-
-    function showSubjects(cls) {
-      title.innerText = `${cls === 'pre-primary' ? 'Pre-Primary' : 'Class ' + cls} Subjects`;
+    function showSubjects(className) {
       classGrid.classList.add('hidden');
-      subjectGrid.classList.remove('hidden');
-      backButton.classList.remove('hidden');
-
-      subjectGrid.innerHTML = '';
-      (subjectMap[cls] || []).forEach(subj => {
-        const page = `${cls}-${subj.toLowerCase().replace(/[^a-z0-9]+/gi, '-')}.html`;
-        const link = document.createElement('a');
-        link.className = 'card';
-        link.href = page;
-        link.textContent = subj;
-        link.role = 'link';
-        link.setAttribute('aria-label', `Open ${subj}`);
-        link.addEventListener('click', e => {
-          e.preventDefault();
-          fetch(page)
-            .then(res => res.ok ? window.location.href = page : Promise.reject())
-            .catch(() => {
-              console.error(`Page not found: ${page}`);
-              alert('Coming Soon! 📚');
-            });
+      if (className === '11' || className === '12') {
+        mainTitle.textContent = `Select Set for Class ${className}`;
+        setGrid.innerHTML = '';
+        Object.keys(subjectMap[className]).forEach(setName => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.textContent = setName;
+          card.onclick = () => {
+            showSetSubjects(className, setName);
+          };
+          setGrid.appendChild(card);
         });
-        subjectGrid.appendChild(link);
-      });
+        setGrid.classList.remove('hidden');
+      } else {
+        mainTitle.textContent = `Subjects for Class ${className}`;
+        subjectGrid.innerHTML = '';
+        subjectMap[className].forEach(subject => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.textContent = subject;
+          subjectGrid.appendChild(card);
+        });
+        subjectGrid.classList.remove('hidden');
+      }
+      backBtn.classList.remove('hidden');
     }
 
-    backButton.addEventListener('click', () => {
-      subjectGrid.classList.add('hidden');
-      backButton.classList.add('hidden');
-      classGrid.classList.remove('hidden');
-      title.innerText = 'Select Your Class';
-    });
+    function showSetSubjects(className, setName) {
+      setGrid.classList.add('hidden');
+      mainTitle.textContent = `${setName} Subjects (Class ${className})`;
+      subjectGrid.innerHTML = '';
+      subjectMap[className][setName].forEach(subject => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.textContent = subject;
+        subjectGrid.appendChild(card);
+      });
+      subjectGrid.classList.remove('hidden');
+    }
+
+    backBtn.onclick = () => {
+      if (!subjectGrid.classList.contains('hidden')) {
+        if (!setGrid.classList.contains('hidden')) {
+          subjectGrid.classList.add('hidden');
+          setGrid.classList.remove('hidden');
+          mainTitle.textContent = `Select Set`;
+        } else {
+          subjectGrid.classList.add('hidden');
+          setGrid.classList.add('hidden');
+          classGrid.classList.remove('hidden');
+          mainTitle.textContent = `Select Your Class`;
+        }
+      } else if (!setGrid.classList.contains('hidden')) {
+        setGrid.classList.add('hidden');
+        classGrid.classList.remove('hidden');
+        mainTitle.textContent = `Select Your Class`;
+      }
+      backBtn.classList.toggle('hidden', classGrid.classList.contains('hidden'));
+    };
+
+    function renderClasses() {
+      for (let i = 0; i <= 12; i++) {
+        const cls = i === 0 ? 'pre-primary' : i;
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.textContent = cls === 'pre-primary' ? 'Pre-Primary' : `Class ${cls}`;
+        card.onclick = () => showSubjects(String(cls));
+        classGrid.appendChild(card);
+      }
+    }
+
+    renderClasses();
   </script>
 </body>
 </html>

@@ -1,11 +1,151 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Subha's Space</title>
   <meta charset="UTF-8">
+  <title>WB Board Study Help</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      margin: 0;
+      padding: 0;
+      color: #111;
+    }
+    header {
+      background: #1e293b;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .container {
+      padding: 40px 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+    .class-grid, .subject-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: 0.2s ease;
+      text-decoration: none;
+      color: #111;
+      font-weight: bold;
+    }
+    .card:hover {
+      background: #dbeafe;
+    }
+    .back-button {
+      margin-top: 20px;
+      display: inline-block;
+      color: #1e40af;
+      cursor: pointer;
+    }
+    .footnote {
+      margin-top: 40px;
+      font-size: 0.85rem;
+      color: #555;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-  <h1>Yo! Welcome to Subha's World 🌍</h1>
-  <p>We help students vibe with academics.</p>
+
+  <header>
+    <h1>Subha4u 🎓</h1>
+    <p>Helping West Bengal Board students from Pre-Primary to Class 12</p>
+  </header>
+
+  <div class="container">
+    <h2 id="main-title">Select Your Class</h2>
+    <div class="class-grid" id="class-grid">
+      <div class="card" onclick="showSubjects('pre-primary')">Pre-Primary</div>
+      <div class="card" onclick="showSubjects(1)">Class 1</div>
+      <div class="card" onclick="showSubjects(2)">Class 2</div>
+      <div class="card" onclick="showSubjects(3)">Class 3</div>
+      <div class="card" onclick="showSubjects(4)">Class 4</div>
+      <div class="card" onclick="showSubjects(5)">Class 5</div>
+      <div class="card" onclick="showSubjects(6)">Class 6</div>
+      <div class="card" onclick="showSubjects(7)">Class 7</div>
+      <div class="card" onclick="showSubjects(8)">Class 8</div>
+      <div class="card" onclick="showSubjects(9)">Class 9</div>
+      <div class="card" onclick="showSubjects(10)">Class 10</div>
+      <div class="card" onclick="showSubjects(11)">Class 11</div>
+      <div class="card" onclick="showSubjects(12)">Class 12</div>
+    </div>
+
+    <div class="subject-grid" id="subject-grid" style="display:none;"></div>
+    <div class="back-button" id="back-button" style="display:none;" onclick="goBack()">← Back to Classes</div>
+
+    <div class="footnote">
+      ⚠️ Note: If any subject doesn't open, it's still being worked on. It’ll be updated soon. 🙏
+    </div>
+  </div>
+
+  <script>
+    const subjectMap = {
+      'pre-primary': ['Bihan', 'Kutum Katam'],
+      1: ['Amar Boi', 'SP'],
+      2: ['Amar Boi', 'SP'],
+      3: ['Bengali', 'English', 'Math', 'Amader Paribesh'],
+      4: ['Bengali (Patabahar + Bhasapath)', 'English', 'Math', 'Amader Paribesh'],
+      5: ['Bengali (Patabahar + Bhasapath)', 'English', 'Math', 'Amader Paribesh'],
+      6: ['Bengali (Sahityamela + Hajabala)', 'English', 'Math', 'Science', 'History', 'Geography'],
+      7: ['Bengali (Sahityamela + Maku)', 'English', 'Math', 'Science', 'History', 'Geography'],
+      8: ['Bengali (Sahityamela + Pather Panchali)', 'English', 'Math', 'Science', 'History', 'Geography'],
+      9: ['Bengali', 'English', 'Mathematics', 'Physical Science', 'Life Science', 'History', 'Geography'],
+      10: ['Bengali', 'English', 'Mathematics', 'Physical Science', 'Life Science', 'History', 'Geography'],
+      11: ['Bengali', 'English', 'Set 1: PHYS, CHEM, MATH, BIOS, etc.', 'Set 2: ACCT, BSTD, CLPA, CSTX, etc.', 'Set 3: POLS, HIST, PSYC, PHIL, etc.'],
+      12: ['Bengali', 'English', 'Set 1: PHYS, CHEM, MATH, BIOS, etc.', 'Set 2: ACCT, BSTD, CLPA, CSTX, etc.', 'Set 3: POLS, HIST, PSYC, PHIL, etc.']
+    };
+
+    let selectedClass = null;
+
+    function showSubjects(cls) {
+      selectedClass = cls;
+      document.getElementById('class-grid').style.display = 'none';
+      document.getElementById('subject-grid').style.display = 'grid';
+      document.getElementById('back-button').style.display = 'inline-block';
+      document.getElementById('main-title').innerText = `${cls === 'pre-primary' ? 'Pre-Primary' : 'Class ' + cls} Subjects`;
+
+      const grid = document.getElementById('subject-grid');
+      grid.innerHTML = '';
+
+      (subjectMap[cls] || []).forEach(subj => {
+        const cleanSubj = subj.toLowerCase().replace(/[^a-z0-9]+/gi, '-');
+        const page = `${cls}-${cleanSubj}.html`;
+        const link = document.createElement('a');
+        link.className = 'card';
+        link.href = page;
+        link.innerText = subj;
+        link.onclick = function(event) {
+          event.preventDefault();
+          fetch(page).then(res => {
+            if (res.status === 200) {
+              window.location.href = page;
+            } else {
+              alert('Coming Soon! 📚');
+            }
+          });
+        };
+        grid.appendChild(link);
+      });
+    }
+
+    function goBack() {
+      document.getElementById('subject-grid').style.display = 'none';
+      document.getElementById('back-button').style.display = 'none';
+      document.getElementById('class-grid').style.display = 'grid';
+      document.getElementById('main-title').innerText = 'Select Your Class';
+    }
+  </script>
+
 </body>
 </html>

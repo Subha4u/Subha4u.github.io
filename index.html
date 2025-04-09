@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>WB Board Study Help</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="West Bengal Board subject guide for students from Pre-Primary to Class 12, organized by class and subject for easy navigation and study." />
+  <title>Subha4u | WB Board Study Help</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -22,7 +24,7 @@
       max-width: 800px;
       margin: auto;
     }
-    .class-grid, .subject-grid {
+    .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
       gap: 16px;
@@ -42,17 +44,23 @@
     .card:hover {
       background: #dbeafe;
     }
+    .hidden {
+      display: none;
+    }
     .back-button {
       margin-top: 20px;
       display: inline-block;
       color: #1e40af;
       cursor: pointer;
     }
-    .footnote {
-      margin-top: 40px;
-      font-size: 0.85rem;
-      color: #555;
-      text-align: center;
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px 10px;
+      }
+      .card {
+        padding: 16px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -65,28 +73,15 @@
 
   <div class="container">
     <h2 id="main-title">Select Your Class</h2>
-    <div class="class-grid" id="class-grid">
-      <div class="card" onclick="showSubjects('pre-primary')">Pre-Primary</div>
-      <div class="card" onclick="showSubjects(1)">Class 1</div>
-      <div class="card" onclick="showSubjects(2)">Class 2</div>
-      <div class="card" onclick="showSubjects(3)">Class 3</div>
-      <div class="card" onclick="showSubjects(4)">Class 4</div>
-      <div class="card" onclick="showSubjects(5)">Class 5</div>
-      <div class="card" onclick="showSubjects(6)">Class 6</div>
-      <div class="card" onclick="showSubjects(7)">Class 7</div>
-      <div class="card" onclick="showSubjects(8)">Class 8</div>
-      <div class="card" onclick="showSubjects(9)">Class 9</div>
-      <div class="card" onclick="showSubjects(10)">Class 10</div>
-      <div class="card" onclick="showSubjects(11)">Class 11</div>
-      <div class="card" onclick="showSubjects(12)">Class 12</div>
+    <div class="grid" id="class-grid">
+      <!-- ARIA-enhanced buttons -->
+      ${[...'pre-primary', ...Array.from({length: 12}, (_, i) => i + 1)].map(cls => `
+        <div class="card" role="button" tabindex="0" aria-label="Select Class ${cls}" data-class="${cls}">${cls === 'pre-primary' ? 'Pre-Primary' : `Class ${cls}`}</div>
+      `).join('')}
     </div>
 
-    <div class="subject-grid" id="subject-grid" style="display:none;"></div>
-    <div class="back-button" id="back-button" style="display:none;" onclick="goBack()">← Back to Classes</div>
-
-    <div class="footnote">
-      ⚠️ Note: If any subject doesn't open, it's still being worked on. It’ll be updated soon. 🙏
-    </div>
+    <div class="grid hidden" id="subject-grid"></div>
+    <div class="back-button hidden" id="back-button">← Back to Classes</div>
   </div>
 
   <script>
@@ -102,49 +97,56 @@
       8: ['Bengali (Sahityamela + Pather Panchali)', 'English', 'Math', 'Science', 'History', 'Geography'],
       9: ['Bengali', 'English', 'Mathematics', 'Physical Science', 'Life Science', 'History', 'Geography'],
       10: ['Bengali', 'English', 'Mathematics', 'Physical Science', 'Life Science', 'History', 'Geography'],
-      11: ['Bengali', 'English', 'Set 1: PHYS, CHEM, MATH, BIOS, etc.', 'Set 2: ACCT, BSTD, CLPA, CSTX, etc.', 'Set 3: POLS, HIST, PSYC, PHIL, etc.'],
-      12: ['Bengali', 'English', 'Set 1: PHYS, CHEM, MATH, BIOS, etc.', 'Set 2: ACCT, BSTD, CLPA, CSTX, etc.', 'Set 3: POLS, HIST, PSYC, PHIL, etc.']
+      11: ['Languages: Bengali, English', 'Set 1', 'Set 2', 'Set 3'],
+      12: ['Languages: Bengali, English', 'Set 1', 'Set 2', 'Set 3']
     };
 
-    let selectedClass = null;
+    const classGrid = document.getElementById('class-grid');
+    const subjectGrid = document.getElementById('subject-grid');
+    const backButton = document.getElementById('back-button');
+    const title = document.getElementById('main-title');
+
+    classGrid.addEventListener('click', e => {
+      const card = e.target.closest('.card');
+      if (!card) return;
+      const cls = card.dataset.class;
+      showSubjects(cls);
+    });
 
     function showSubjects(cls) {
-      selectedClass = cls;
-      document.getElementById('class-grid').style.display = 'none';
-      document.getElementById('subject-grid').style.display = 'grid';
-      document.getElementById('back-button').style.display = 'inline-block';
-      document.getElementById('main-title').innerText = `${cls === 'pre-primary' ? 'Pre-Primary' : 'Class ' + cls} Subjects`;
+      title.innerText = `${cls === 'pre-primary' ? 'Pre-Primary' : 'Class ' + cls} Subjects`;
+      classGrid.classList.add('hidden');
+      subjectGrid.classList.remove('hidden');
+      backButton.classList.remove('hidden');
 
-      const grid = document.getElementById('subject-grid');
-      grid.innerHTML = '';
-
+      subjectGrid.innerHTML = '';
       (subjectMap[cls] || []).forEach(subj => {
-        const cleanSubj = subj.toLowerCase().replace(/[^a-z0-9]+/gi, '-');
-        const page = `${cls}-${cleanSubj}.html`;
+        const page = `${cls}-${subj.toLowerCase().replace(/[^a-z0-9]+/gi, '-')}.html`;
         const link = document.createElement('a');
         link.className = 'card';
         link.href = page;
         link.innerText = subj;
-        link.onclick = function(event) {
-          event.preventDefault();
-          fetch(page).then(res => {
-            if (res.status === 200) {
-              window.location.href = page;
-            } else {
+        link.role = 'link';
+        link.setAttribute('aria-label', `Open ${subj}`);
+        link.addEventListener('click', e => {
+          e.preventDefault();
+          fetch(page)
+            .then(res => res.ok ? window.location.href = page : Promise.reject())
+            .catch(() => {
+              console.error(`Page not found: ${page}`);
               alert('Coming Soon! 📚');
-            }
-          });
-        };
-        grid.appendChild(link);
+            });
+        });
+        subjectGrid.appendChild(link);
       });
     }
 
-    function goBack() {
-      document.getElementById('subject-grid').style.display = 'none';
-      document.getElementById('back-button').style.display = 'none';
-      document.getElementById('class-grid').style.display = 'grid';
-      document.getElementById('main-title').innerText = 'Select Your Class';
-    }
+    backButton.addEventListener('click', () => {
+      subjectGrid.classList.add('hidden');
+      backButton.classList.add('hidden');
+      classGrid.classList.remove('hidden');
+      title.innerText = 'Select Your Class';
+    });
   </script>
 
 </body>
